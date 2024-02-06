@@ -38,7 +38,7 @@
             font-family: "Permanent Marker", cursive;
             text-align: center;
             font-size: 24px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         #statusText {
@@ -58,6 +58,7 @@
 
         #sizeButtons {
             margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         #sizeButtons button {
@@ -70,8 +71,9 @@
 </head>
 
 <body>
-    <div id="gameContainer">
-        <h1>Game XO</h1>
+    <div id="gameContainer"><br>
+        <h2>Game XO</h2>
+        Choose game size 
         <div id="sizeButtons">
             <button onclick="changeGridSize(3)">3x3</button>
             <button onclick="changeGridSize(4)">4x4</button>
@@ -79,7 +81,7 @@
             <button onclick="changeGridSize(6)">6x6</button>
         </div>
         <div id="cellContainer"></div>
-        <h2 id="statusText"></h2>
+        <h3 id="statusText"></h3>        
         <button id="restartBtn" onclick="restartGame()">Restart</button>
     </div>
 
