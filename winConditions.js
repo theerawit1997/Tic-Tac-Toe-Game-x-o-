@@ -1,4 +1,4 @@
-var size = 4;
+var size = 3;
 console.log("size:", size);
 
 var resultsWin = [];
