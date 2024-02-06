@@ -48,9 +48,20 @@
 
         #cellContainer {
             display: grid;
-            grid-template-columns: repeat(3, auto);
+            /* grid-template-columns: repeat(3, auto); */
             width: 225px;
             margin: auto;
+        }
+
+        #sizeButtons {
+            margin-top: 10px;
+        }
+
+        #sizeButtons button {
+            margin: 5px;
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -58,141 +69,150 @@
 <body>
     <div id="gameContainer">
         <h1>Game XO</h1>
+        <div id="sizeButtons">
+            <button onclick="changeGridSize(3)">3x3</button>
+            <button onclick="changeGridSize(4)">4x4</button>
+            <button onclick="changeGridSize(5)">5x5</button>
+            <button onclick="changeGridSize(6)">6x6</button>
+        </div>
         <div id="cellContainer"></div>
         <h2 id="statusText"></h2>
-        <button id="restartBtn">Restart</button>
+        <button id="restartBtn" onclick="restartGame()">Restart</button>
     </div>
 
     <script>
-        const size = 3;
+        let size = 3; // Initial size
+        let winConditions = [];
         const cellContainer = document.getElementById("cellContainer");
 
-        for (let i = 0; i < size; i++) {
-            const row = document.createElement("div");
-            row.classList.add("row");
-
-            for (let j = 0; j < size; j++) {
-                const cell = document.createElement("div");
-                cell.setAttribute("cellIndex", i * size + j);
-                cell.classList.add("cell");
-
-                row.appendChild(cell);
-            }
-
-            cellContainer.appendChild(row);
-        }
-
-        const cells = document.querySelectorAll(".cell");
-        const statusText = document.querySelector("#statusText");
-        const restartBtn = document.querySelector("#restartBtn");
-        let winConditions = [];
-        // horizontal
-        for (let i = 0; i < size * size; i += size) {
-            let row1 = [];
-            for (let j = 0; j < size; j++) {
-                row1.push(i + j);
-            }
-            winConditions.push(row1);
-        }
-        // vertical
-        for (let j = 0; j < size; j++) {
-            let row2 = [];
-            for (let i = 0; i < size * size; i += size) {
-                row2.push(i + j);
-            }
-            winConditions.push(row2);
-        }
-        // diagonally-down
-        let row3 = [];
-        for (let i = 0; i < size; i++) {
-            let tmp = (size + 1) * i;
-            row3.push(tmp);
-        }
-        winConditions.push(row3);
-        // diagonally-up
-        let row4 = [];
-        for (let i = 0; i < size; i++) {
-            let tmp = (size - 1) * i + (size - 1);
-            row4.push(tmp);
-        }
-        winConditions.push(row4);
-
-        let options = [];
-        for (let i = 0; i < size * size; i++) {
-            let tmp = "";
-            options.push(tmp);
-        }
-        let currentPlayer = "X";
-        let running = false;
-
-        initializeGame();
-
         function initializeGame() {
+            cellContainer.innerHTML = ""; // Clear existing cells
+
+            for (let i = 0; i < size; i++) {
+                const row = document.createElement("div");
+                row.classList.add("row");
+
+                for (let j = 0; j < size; j++) {
+                    const cell = document.createElement("div");
+                    cell.setAttribute("cellIndex", i * size + j);
+                    cell.classList.add("cell");
+
+                    row.appendChild(cell);
+                }
+
+                cellContainer.appendChild(row);
+            }
+
+            // Set grid-template-columns dynamically based on the selected size
+            cellContainer.style.gridTemplateColumns = `repeat(${size}, auto)`;
+
+            const cells = document.querySelectorAll(".cell");
+            const statusText = document.querySelector("#statusText");
+            const restartBtn = document.querySelector("#restartBtn");
+
+            let options = Array(size * size).fill("");
+            let currentPlayer = "X";
+            let running = false;
+
             cells.forEach((cell) => cell.addEventListener("click", cellClicked));
             restartBtn.addEventListener("click", restartGame);
             statusText.textContent = `${currentPlayer}'s turn`;
             running = true;
-        }
 
-        function cellClicked() {
-            const cellIndex = this.getAttribute("cellIndex");
+            function cellClicked() {
+                const cellIndex = this.getAttribute("cellIndex");
 
-            if (options[cellIndex] !== "" || !running) {
-                return;
-            }
-
-            updateCell(this, cellIndex);
-            checkWinner();
-            if (running) {
-                changePlayer();
-            }
-        }
-
-
-        function updateCell(cell, index) {
-            options[index] = currentPlayer;
-            cell.textContent = currentPlayer;
-        }
-
-        function changePlayer() {
-            currentPlayer = currentPlayer === "X" ? "O" : "X";
-            statusText.textContent = `${currentPlayer}'s turn`;
-        }
-
-        function checkWinner() {
-            for (let condition of winConditions) {
-                const [a, b, c] = condition;
-                if (
-                    options[a] !== "" &&
-                    options[a] === options[b] &&
-                    options[b] === options[c]
-                ) {
-                    endGame(options[a]);
+                if (options[cellIndex] !== "" || !running) {
                     return;
+                }
+
+                updateCell(this, cellIndex);
+                checkWinner();
+                if (running) {
+                    changePlayer();
                 }
             }
 
-            if (!options.includes("") && running) {
-                endGame("Draw");
+            function updateCell(cell, index) {
+                options[index] = currentPlayer;
+                cell.textContent = currentPlayer;
+            }
+
+            function changePlayer() {
+                currentPlayer = currentPlayer === "X" ? "O" : "X";
+                statusText.textContent = `${currentPlayer}'s turn`;
+            }
+
+            function checkWinner() {
+                for (let condition of winConditions) {
+                    const isWinningCombo = condition.every(index => options[index] === currentPlayer);
+
+                    if (isWinningCombo) {
+                        endGame(currentPlayer);
+                        return;
+                    }
+                }
+
+                if (!options.includes("") && running) {
+                    endGame("Draw");
+                }
+            }
+
+            function endGame(result) {
+                running = false;
+                statusText.textContent =
+                    result === "Draw" ? "It's a Draw!" : `${result} player wins!`;
+            }
+
+            function restartGame() {
+                options = Array(size * size).fill("");
+                currentPlayer = "X";
+                running = true;
+                statusText.textContent = `${currentPlayer}'s turn`;
+                cells.forEach((cell) => {
+                    cell.textContent = "";
+                });
             }
         }
+        function changeGridSize(newSize) {
+            size = newSize;
+            initializeGame(); // Reinitialize the game with the new size
 
-        function endGame(result) {
-            running = false;
-            statusText.textContent =
-                result === "Draw" ? "It's a Draw!" : `${result} player wins!`;
-        }
+            // Recalculate win conditions based on the new size
+            winConditions = [];
 
-        function restartGame() {
-            options = Array(size * size).fill("");
-            
-            currentPlayer = "X";
-            running = true;
-            statusText.textContent = `${currentPlayer}'s turn`;
+            for (let i = 0; i < size * size; i += size) {
+                let row1 = [];
+                for (let j = 0; j < size; j++) {
+                    row1.push(i + j);
+                }
+                winConditions.push(row1);
+            }
 
-            cells.forEach((cell) => {
-                cell.textContent = "";
-            });
+            for (let j = 0; j < size; j++) {
+                let row2 = [];
+                for (let i = 0; i < size * size; i += size) {
+                    row2.push(i + j);
+                }
+                winConditions.push(row2);
+            }
+
+            let row3 = [];
+            for (let i = 0; i < size; i++) {
+                let tmp = (size + 1) * i;
+                row3.push(tmp);
+            }
+            winConditions.push(row3);
+
+            let row4 = [];
+            for (let i = 0; i < size; i++) {
+                let tmp = (size - 1) * i + (size - 1);
+                row4.push(tmp);
+            }
+            winConditions.push(row4);
+
+            console.log("size:", size);
+            console.log("All way to win :", winConditions);
         }
 
     </script>
