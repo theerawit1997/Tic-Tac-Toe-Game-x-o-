@@ -20,7 +20,6 @@
             margin: 0;
         }
 
-
         .cell {
             width: 75px;
             height: 75px;
@@ -48,8 +47,12 @@
 
         #cellContainer {
             display: grid;
-            /* grid-template-columns: repeat(3, auto); */
-            width: 225px;
+            grid-gap: 0px;
+            /* Adjust the gap between cells if needed */
+            width: auto;
+            /* Remove fixed width */
+            justify-content: center;
+            /* Center the grid within the container */
             margin: auto;
         }
 
