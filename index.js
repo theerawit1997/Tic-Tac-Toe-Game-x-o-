@@ -75,68 +75,77 @@ function initializeGame() {
 
   options = Array(totalCells).fill("");
   currentPlayer = "X";
-  // running = false;
+  running = true;
 
   cells.forEach((cell) => cell.addEventListener("click", cellClicked));
   restartBtn.addEventListener("click", restartGame);
   statusText.textContent = `${currentPlayer}'s turn`;
-  running = true;
+  statusText.style.color = getColor(currentPlayer);
+}
 
-  function cellClicked() {
-    const cellIndex = this.getAttribute("cellIndex");
+function cellClicked() {
+  const cellIndex = this.getAttribute("cellIndex");
 
-    if (options[cellIndex] !== "" || !running) {
+  if (options[cellIndex] !== "" || !running) {
+    return;
+  }
+
+  updateCell(this, cellIndex);
+  checkWinner();
+  if (running) {
+    changePlayer();
+  }
+}
+
+function updateCell(cell, index) {
+  options[index] = currentPlayer;
+  const contentSpan = cell.querySelector(".content");
+
+  if (contentSpan) {
+    // Clear any existing content and classes
+    contentSpan.textContent = "";
+    contentSpan.classList.remove("X", "O");
+
+    // Set the new content and add the class
+    contentSpan.textContent = currentPlayer;
+    contentSpan.classList.add("content", currentPlayer);
+  }
+}
+
+function changePlayer() {
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+  statusText.innerHTML = `<span style="color: ${getColor(
+    currentPlayer
+  )};">${currentPlayer}'s turn</span>`;
+}
+
+function checkWinner() {
+  for (let condition of winConditions) {
+    const isWinningCombo = condition.every(
+      (index) => options[index] === currentPlayer
+    );
+
+    if (isWinningCombo) {
+      endGame(currentPlayer);
       return;
     }
-
-    updateCell(this, cellIndex);
-    checkWinner();
-    if (running) {
-      changePlayer();
-    }
   }
 
-  function updateCell(cell, index) {
-    options[index] = currentPlayer;
-    const contentSpan = cell.querySelector(".content");
-
-    if (contentSpan) {
-      // Clear any existing content and classes
-      contentSpan.innerHTML = "";
-
-      // Set the new content and add the class
-      contentSpan.textContent = currentPlayer;
-      contentSpan.classList.add("content", currentPlayer);
-    }
+  if (!options.includes("") && running) {
+    endGame("Draw");
   }
+}
 
-  function changePlayer() {
-    currentPlayer = currentPlayer === "X" ? "O" : "X";
-    statusText.textContent = `${currentPlayer}'s turn`;
-  }
+function endGame(result) {
+  running = false;
+  const color = result === "Draw" ? "black" : getColor(result);
+  statusText.innerHTML = `<span style="color: ${color};">${
+    result === "Draw" ? "It's a Draw!" : `${result} player wins!`
+  }</span>`;
+}
 
-  function checkWinner() {
-    for (let condition of winConditions) {
-      const isWinningCombo = condition.every(
-        (index) => options[index] === currentPlayer
-      );
-
-      if (isWinningCombo) {
-        endGame(currentPlayer);
-        return;
-      }
-    }
-
-    if (!options.includes("") && running) {
-      endGame("Draw");
-    }
-  }
-
-  function endGame(result) {
-    running = false;
-    statusText.textContent =
-      result === "Draw" ? "It's a Draw!" : `${result} player wins!`;
-  }
+function getColor(player) {
+  return player === "X" ? "red" : "blue";
 }
 
 function changeGridSize(newSize) {
@@ -158,9 +167,8 @@ function restartGame() {
   cells.forEach((cell) => {
     const contentSpan = cell.querySelector(".content");
     if (contentSpan) {
-      contentSpan.textContent = ""; // Use textContent instead of innerHTML
-      contentSpan.classList.remove("X", "O"); // Remove X and O classes
+      contentSpan.textContent = "";
+      contentSpan.classList.remove("X", "O");
     }
   });
 }
-
