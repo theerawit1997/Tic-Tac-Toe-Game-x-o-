@@ -138,10 +138,21 @@ function checkWinner() {
 
 function endGame(result) {
   running = false;
-  const color = result === "Draw" ? "black" : getColor(result);
-  statusText.innerHTML = `<span style="color: ${color};">${
-    result === "Draw" ? "It's a Draw!" : `${result} player wins!`
-  }</span>`;
+  statusText.textContent =
+    result === "Draw" ? "It's a Draw!" : `${result} player wins!`;
+
+  // Highlight the winning cells
+  if (result !== "Draw") {
+    const winningCells = winConditions.find((condition) => {
+      return condition.every((index) => options[index] === result);
+    });
+
+    if (winningCells) {
+      for (const index of winningCells) {
+        cells[index].classList.add("highlight");
+      }
+    }
+  }
 }
 
 function getColor(player) {
@@ -170,5 +181,8 @@ function restartGame() {
       contentSpan.textContent = "";
       contentSpan.classList.remove("X", "O");
     }
+
+    // Remove highlight class
+    cell.classList.remove("highlight");
   });
 }
