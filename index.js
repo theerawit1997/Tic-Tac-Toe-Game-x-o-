@@ -127,6 +127,7 @@ function checkWinner() {
 
     if (isWinningCombo) {
       endGame(currentPlayer);
+      highlightWinnerCells(condition);
       return;
     }
   }
@@ -138,25 +139,27 @@ function checkWinner() {
 
 function endGame(result) {
   running = false;
-  statusText.textContent =
-    result === "Draw" ? "It's a Draw!" : `${result} player wins!`;
+  let resultColor;
 
-  // Highlight the winning cells
-  if (result !== "Draw") {
-    const winningCells = winConditions.find((condition) => {
-      return condition.every((index) => options[index] === result);
-    });
-
-    if (winningCells) {
-      for (const index of winningCells) {
-        cells[index].classList.add("highlight");
-      }
-    }
+  if (result === "Draw") {
+    resultColor = "black";
+  } else {
+    resultColor = getColor(result);
   }
+
+  statusText.innerHTML = `<span style="color: ${resultColor};">${result} player wins!</span>`;
 }
 
 function getColor(player) {
   return player === "X" ? "red" : "blue";
+}
+
+function highlightWinnerCells(winningCombo) {
+  // Add the highlight class to the winning cells
+  winningCombo.forEach((index) => {
+    const cell = cells[index];
+    cell.classList.add(`highlight-${currentPlayer}`);
+  });
 }
 
 function changeGridSize(newSize) {
@@ -182,7 +185,7 @@ function restartGame() {
       contentSpan.classList.remove("X", "O");
     }
 
-    // Remove highlight class
-    cell.classList.remove("highlight");
+    // Remove highlight classes for both X and O
+    cell.classList.remove("highlight-X", "highlight-O");
   });
 }
