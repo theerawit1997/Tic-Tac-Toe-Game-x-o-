@@ -116,6 +116,7 @@ function cellClicked() {
 function updateCell(cell, index) {
   options[index] = currentPlayer;
   const contentSpan = cell.querySelector(".content");
+  console.log("turn:",currentPlayer);
 
   if (contentSpan) {
     // Clear any existing content and classes
@@ -135,14 +136,16 @@ function updateCell(cell, index) {
   }
 
   // Update playHistory array
-  playHistory.push(index);
+  let tmp = [currentPlayer,index]
+  playHistory.push(tmp);
+  console.log("index:",tmp);
 }
 
 function changePlayer() {
   currentPlayer = currentPlayer === "X" ? "O" : "X";
   statusText.innerHTML = `<span style="color: ${getColor(
     currentPlayer
-  )};">${currentPlayer}'s turn</span>`;
+  )};">${currentPlayer}'s turn</span>`;  
 }
 
 function checkWinner() {
@@ -152,13 +155,14 @@ function checkWinner() {
     );
 
     if (isWinningCombo) {
-      endGame(currentPlayer);
+      console.log("isWinningCombo:",condition);
+      endGame(currentPlayer);      
       return;
     }
   }
 
   if (!options.includes("") && running) {
-    endGame("Draw");
+    endGame("Draw");    
   }
 }
 
@@ -167,9 +171,10 @@ function endGame(result) {
 
   if (result === "Draw") {
     statusText.innerHTML = '<span style="color: black;">It\'s a Draw!</span>';
+    console.log("Draw!");
   } else {
     statusText.innerHTML = `<span style="color: ${getColor(result)};">${result} player wins!</span>`;
-
+    console.log("player wins! :",result);
     // Highlight the winning cells
     const winningCells = winConditions.find((condition) => {
       return condition.every((index) => options[index] === result);
@@ -182,9 +187,9 @@ function endGame(result) {
     }
   }
 
-  console.log("PlayerX array:", playerX);
-  console.log("PlayerO array:", playerO);
-  console.log("PlayHistory array:", playHistory);
+  console.log("PlayerX History:", playerX);
+  console.log("PlayerO History:", playerO);
+  console.log("Game History:", playHistory);
 }
 
 function getColor(player) {
@@ -198,9 +203,11 @@ function changeGridSize(newSize) {
     winConditions = []; // Recalculate win conditions based on the new size
     initializeGame(); // Reinitialize the game with the new size
   }
+  console.log("changeGridSize",newSize);
 }
 
 function restartGame() {
+  console.log("restartGame");
   options = Array(totalCells).fill("");
   currentPlayer = "X";
   running = true;
@@ -221,5 +228,5 @@ function restartGame() {
   // Reset player arrays
   playerX = [];
   playerO = [];
-  playHistory = [];
+  playHistory = [];  
 }
