@@ -1,18 +1,26 @@
 const cellContainer = document.getElementById("cellContainer");
 let size = 3; // Initial size
 let totalCells = size * size;
-let cells; // Declare cells in the global scope
-let statusText; // Declare statusText in the global scope
-let restartBtn; // Declare restartBtn in the global scope
+let cells; // Declare statusText in the global scope
+let statusText; 
+let restartBtn; 
 let options;
 let currentPlayer;
 let running;
 let winConditions;
+let playerX = [];
+let playerO = [];
+let playHistory = [];
 
 initializeGame();
 
 function initializeGame() {
   cellContainer.innerHTML = ""; // Clear existing cells
+
+  // Reset player arrays
+  playerX = [];
+  playerO = [];
+  playHistory = [];
 
   for (let i = 0; i < size; i++) {
     const row = document.createElement("div");
@@ -118,6 +126,16 @@ function updateCell(cell, index) {
     contentSpan.textContent = currentPlayer;
     contentSpan.classList.add("content", currentPlayer);
   }
+
+  // Update player arrays
+  if (currentPlayer === "X") {
+    playerX.push(index);
+  } else {
+    playerO.push(index);
+  }
+
+  // Update playHistory array
+  playHistory.push(index);
 }
 
 function changePlayer() {
@@ -146,11 +164,13 @@ function checkWinner() {
 
 function endGame(result) {
   running = false;
-  statusText.textContent =
-    result === "Draw" ? "It's a Draw!" : `${result} player wins!`;
 
-  // Highlight the winning cells
-  if (result !== "Draw") {
+  if (result === "Draw") {
+    statusText.innerHTML = '<span style="color: black;">It\'s a Draw!</span>';
+  } else {
+    statusText.innerHTML = `<span style="color: ${getColor(result)};">${result} player wins!</span>`;
+
+    // Highlight the winning cells
     const winningCells = winConditions.find((condition) => {
       return condition.every((index) => options[index] === result);
     });
@@ -161,6 +181,10 @@ function endGame(result) {
       }
     }
   }
+
+  console.log("PlayerX array:", playerX);
+  console.log("PlayerO array:", playerO);
+  console.log("PlayHistory array:", playHistory);
 }
 
 function getColor(player) {
@@ -193,4 +217,9 @@ function restartGame() {
     // Remove highlight class
     cell.classList.remove("highlight");
   });
+
+  // Reset player arrays
+  playerX = [];
+  playerO = [];
+  playHistory = [];
 }
