@@ -31,14 +31,6 @@ body {
   color: blue;
 }
 
-.cell.highlight-X {
-  background-color: red; /* Set the highlight color for X */
-}
-
-.cell.highlight-O {
-  background-color: blue; /* Set the highlight color for O */
-}
-
 .cell:hover {
   background-color: #a3a1a1;
 }
@@ -75,4 +67,16 @@ body {
   padding: 5px 10px;
   font-size: 16px;
   cursor: pointer;
+}
+
+.cell.highlight {
+  background-color: yellow; /* You can change the color to your preference */
+}
+
+.cell-number {
+  position: absolute;
+  top: 25px;
+  right: 5px;
+  font-size: 12px;
+  color: #555;
 }

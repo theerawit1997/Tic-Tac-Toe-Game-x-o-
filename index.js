@@ -21,12 +21,20 @@ function initializeGame() {
     for (let j = 0; j < size; j++) {
       const cell = document.createElement("div");
       const contentSpan = document.createElement("span"); // Create a span for the content
-      cell.setAttribute("cellIndex", i * size + j);
+      const cellIndex = i * size + j;
+
+      cell.setAttribute("cellIndex", cellIndex);
       cell.classList.add("cell");
 
       // Add the span to the cell and set its class
       cell.appendChild(contentSpan);
       contentSpan.classList.add("content");
+
+      // Add a small number to represent the cell location
+      const numberSpan = document.createElement("span");
+      numberSpan.textContent = cellIndex;
+      numberSpan.classList.add("cell-number");
+      cell.appendChild(numberSpan);
 
       row.appendChild(cell);
     }
@@ -127,7 +135,6 @@ function checkWinner() {
 
     if (isWinningCombo) {
       endGame(currentPlayer);
-      highlightWinnerCells(condition);
       return;
     }
   }
@@ -139,27 +146,25 @@ function checkWinner() {
 
 function endGame(result) {
   running = false;
-  let resultColor;
+  statusText.textContent =
+    result === "Draw" ? "It's a Draw!" : `${result} player wins!`;
 
-  if (result === "Draw") {
-    resultColor = "black";
-  } else {
-    resultColor = getColor(result);
+  // Highlight the winning cells
+  if (result !== "Draw") {
+    const winningCells = winConditions.find((condition) => {
+      return condition.every((index) => options[index] === result);
+    });
+
+    if (winningCells) {
+      for (const index of winningCells) {
+        cells[index].classList.add("highlight");
+      }
+    }
   }
-
-  statusText.innerHTML = `<span style="color: ${resultColor};">${result} player wins!</span>`;
 }
 
 function getColor(player) {
   return player === "X" ? "red" : "blue";
-}
-
-function highlightWinnerCells(winningCombo) {
-  // Add the highlight class to the winning cells
-  winningCombo.forEach((index) => {
-    const cell = cells[index];
-    cell.classList.add(`highlight-${currentPlayer}`);
-  });
 }
 
 function changeGridSize(newSize) {
@@ -185,7 +190,7 @@ function restartGame() {
       contentSpan.classList.remove("X", "O");
     }
 
-    // Remove highlight classes for both X and O
-    cell.classList.remove("highlight-X", "highlight-O");
+    // Remove highlight class
+    cell.classList.remove("highlight");
   });
 }
