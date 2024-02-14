@@ -267,6 +267,9 @@ function startReplay() {
   restartBtn.disabled = true;
   replayBtn.disabled = true;
 
+  // Disable grid size buttons during replay
+  disableGridSizeButtons();
+
   // Reset the game and start replaying moves
   initializeGame();
   replayIndex = 0;
@@ -293,6 +296,9 @@ function replayNextMove() {
     // I don't know why without it it doesn't checkWinner();
     changePlayer();
     checkWinner();
+
+    // Enable grid size buttons after replay is complete
+    enableGridSizeButtons();
   }
 }
 
@@ -310,4 +316,18 @@ function replayMove(move) {
   statusText.innerHTML = `<span style="color: ${getColor(
     player
   )};">${player}'s turn (Replaying)</span>`;
+}
+
+function disableGridSizeButtons() {
+  const gridSizeButtons = document.querySelectorAll("#sizeButtons button");
+  gridSizeButtons.forEach(button => {
+    button.disabled = true;
+  });
+}
+
+function enableGridSizeButtons() {
+  const gridSizeButtons = document.querySelectorAll("#sizeButtons button");
+  gridSizeButtons.forEach(button => {
+    button.disabled = false;
+  });
 }
