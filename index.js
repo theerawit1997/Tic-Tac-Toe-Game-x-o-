@@ -104,9 +104,9 @@ function initializeGame() {
   }
   winConditions.push(row4);
 
-  console.log("size:", size);
+  // console.log("size:", size);
   // console.log("totalCells:", totalCells);
-  console.log("All way to win :", winConditions);
+  // console.log("All way to win :", winConditions);
 
   options = Array(totalCells).fill("");
   currentPlayer = "X";
@@ -134,7 +134,7 @@ function cellClicked() {
 function updateCell(cell, index) {
   options[index] = currentPlayer;
   const contentSpan = cell.querySelector(".content");
-  console.log("turn:", currentPlayer);
+  // console.log("turn:", currentPlayer);
 
   if (contentSpan) {
     // Clear any existing content and classes
@@ -155,7 +155,7 @@ function updateCell(cell, index) {
     }
     // Update playHistory array only during the actual game, not during replay
     playHistory.push({ player: currentPlayer, index });
-    console.log({ player: currentPlayer, index });
+    // console.log({ player: currentPlayer, index });
   }
 }
 
@@ -173,7 +173,7 @@ function checkWinner() {
     );
 
     if (isWinningCombo) {
-      console.log("isWinningCombo:", condition);
+      // console.log("isWinningCombo:", condition);
       endGame(currentPlayer);
       return;
     }
@@ -189,12 +189,12 @@ function endGame(result) {
 
   if (result === "Draw") {
     statusText.innerHTML = '<span style="color: black;">It\'s a Draw!</span>';
-    console.log("Draw!");
+    // console.log("Draw!");
   } else {
     statusText.innerHTML = `<span style="color: ${getColor(
       result
     )};">${result} player wins!</span>`;
-    console.log("player wins! :", result);
+    // console.log("player wins! :", result);
     // Highlight the winning cells
     const winningCells = winConditions.find((condition) => {
       return condition.every((index) => options[index] === result);
@@ -207,9 +207,10 @@ function endGame(result) {
     }
   }
 
-  console.log("PlayerX History:", playerX);
-  console.log("PlayerO History:", playerO);
-  console.log("Game History:", playHistory);
+  // console.log("PlayerX History:", playerX);
+  // console.log("PlayerO History:", playerO);
+  // console.log("Game History:", playHistory);
+  replayBtn.disabled = false;
 }
 
 function getColor(player) {
@@ -217,13 +218,14 @@ function getColor(player) {
 }
 
 function changeGridSize(newSize) {
-  if (newSize !== size) {
+  if (newSize !== size) {    
     size = newSize;
     totalCells = size * size;
-    winConditions = []; // Recalculate win conditions based on the new size
+    winConditions = []; // Recalculate win conditions based on the new size    
     initializeGame(); // Reinitialize the game with the new size
+    restartGame()
   }
-  console.log("changeGridSize", newSize);
+  // console.log("changeGridSize", newSize);
 }
 
 function restartGame() {
@@ -248,17 +250,18 @@ function restartGame() {
   playerX = [];
   playerO = [];
   playHistory = [];
-  console.log("restartGame");
+  // console.log("restartGame");
+  replayBtn.disabled = true;
 }
 
 function startReplay() {
   if (playHistory.length === 0) {
-    console.log("No moves to replay.");
+    // console.log("No moves to replay.");
     replayStatus = false;
     return;
   }
 
-  console.log("start Replay");
+  // console.log("start Replay");
 
   // Disable the "Restart" and "Replay" buttons during replay
   restartBtn.disabled = true;
@@ -267,13 +270,13 @@ function startReplay() {
   // Reset the game and start replaying moves
   initializeGame();
   replayIndex = 0;
-  replayStatus = true;  // Set replayStatus to true after initializing
+  replayStatus = true; // Set replayStatus to true after initializing
   replayNextMove();
 }
 
 function replayNextMove() {
-  console.log("Replaying move", replayIndex, "of", playHistory.length);
-  
+  // console.log("Replaying move", replayIndex, "of", playHistory.length);
+
   if (replayIndex < playHistory.length) {
     const move = playHistory[replayIndex];
     replayMove(move);
@@ -281,14 +284,14 @@ function replayNextMove() {
     setTimeout(replayNextMove, 1000); // Adjust the delay between moves as needed
   } else {
     // console.log("currentPlayer",currentPlayer);
-    console.log("Replay complete");
+    // console.log("Replay complete");
     // Enable the "Restart" and "Replay" buttons after replay is complete
     restartBtn.disabled = false;
     replayBtn.disabled = false;
-    replayStatus = false;  // Set replayStatus to false after replay is complete
+    replayStatus = false; // Set replayStatus to false after replay is complete
 
     // I don't know why without it it doesn't checkWinner();
-    changePlayer();  
+    changePlayer();
     checkWinner();
   }
 }
