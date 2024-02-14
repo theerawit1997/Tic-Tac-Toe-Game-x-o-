@@ -2,8 +2,8 @@ const cellContainer = document.getElementById("cellContainer");
 let size = 3; // Initial size
 let totalCells = size * size;
 let cells; // Declare statusText in the global scope
-let statusText; 
-let restartBtn; 
+let statusText;
+let restartBtn;
 let options;
 let currentPlayer;
 let running;
@@ -12,7 +12,17 @@ let playerX = [];
 let playerO = [];
 let playHistory = [];
 
-initializeGame();
+document.addEventListener("DOMContentLoaded", function () {
+  initializeGame();
+
+  // Move the event listener assignment for the "Restart" button here
+  restartBtn = document.querySelector("#restartBtn");
+
+  // Check if the event listener has not been attached before adding it
+  if (!restartBtn.onclick) {
+    restartBtn.onclick = restartGame;
+  }
+});
 
 function initializeGame() {
   cellContainer.innerHTML = ""; // Clear existing cells
@@ -55,7 +65,6 @@ function initializeGame() {
 
   cells = document.querySelectorAll(".cell");
   statusText = document.querySelector("#statusText");
-  restartBtn = document.querySelector("#restartBtn");
 
   winConditions = [];
   for (let i = 0; i < totalCells; i += size) {
@@ -94,7 +103,6 @@ function initializeGame() {
   running = true;
 
   cells.forEach((cell) => cell.addEventListener("click", cellClicked));
-  restartBtn.addEventListener("click", restartGame);
   statusText.textContent = `${currentPlayer}'s turn`;
   statusText.style.color = getColor(currentPlayer);
 }
@@ -116,7 +124,7 @@ function cellClicked() {
 function updateCell(cell, index) {
   options[index] = currentPlayer;
   const contentSpan = cell.querySelector(".content");
-  console.log("turn:",currentPlayer);
+  console.log("turn:", currentPlayer);
 
   if (contentSpan) {
     // Clear any existing content and classes
@@ -136,16 +144,18 @@ function updateCell(cell, index) {
   }
 
   // Update playHistory array
-  let tmp = [currentPlayer,index]
-  playHistory.push(tmp);
-  console.log("index:",tmp);
+  // let tmp = [currentPlayer,index]
+  // playHistory.push(tmp);
+  // console.log("index:",tmp);
+  playHistory.push(index);
+  console.log("index:", index);
 }
 
 function changePlayer() {
   currentPlayer = currentPlayer === "X" ? "O" : "X";
   statusText.innerHTML = `<span style="color: ${getColor(
     currentPlayer
-  )};">${currentPlayer}'s turn</span>`;  
+  )};">${currentPlayer}'s turn</span>`;
 }
 
 function checkWinner() {
@@ -155,14 +165,14 @@ function checkWinner() {
     );
 
     if (isWinningCombo) {
-      console.log("isWinningCombo:",condition);
-      endGame(currentPlayer);      
+      console.log("isWinningCombo:", condition);
+      endGame(currentPlayer);
       return;
     }
   }
 
   if (!options.includes("") && running) {
-    endGame("Draw");    
+    endGame("Draw");
   }
 }
 
@@ -173,8 +183,10 @@ function endGame(result) {
     statusText.innerHTML = '<span style="color: black;">It\'s a Draw!</span>';
     console.log("Draw!");
   } else {
-    statusText.innerHTML = `<span style="color: ${getColor(result)};">${result} player wins!</span>`;
-    console.log("player wins! :",result);
+    statusText.innerHTML = `<span style="color: ${getColor(
+      result
+    )};">${result} player wins!</span>`;
+    console.log("player wins! :", result);
     // Highlight the winning cells
     const winningCells = winConditions.find((condition) => {
       return condition.every((index) => options[index] === result);
@@ -203,11 +215,10 @@ function changeGridSize(newSize) {
     winConditions = []; // Recalculate win conditions based on the new size
     initializeGame(); // Reinitialize the game with the new size
   }
-  console.log("changeGridSize",newSize);
+  console.log("changeGridSize", newSize);
 }
 
 function restartGame() {
-  console.log("restartGame");
   options = Array(totalCells).fill("");
   currentPlayer = "X";
   running = true;
@@ -228,5 +239,6 @@ function restartGame() {
   // Reset player arrays
   playerX = [];
   playerO = [];
-  playHistory = [];  
+  playHistory = [];
+  console.log("restartGame");
 }
