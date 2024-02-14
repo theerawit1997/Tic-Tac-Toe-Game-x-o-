@@ -11,16 +11,26 @@ let winConditions;
 let playerX = [];
 let playerO = [];
 let playHistory = [];
+let replayStatus = false;
+
+// Add the following lines to the global scope for replay functionality
+let replayBtn;
+let replayIndex = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeGame();
 
   // Move the event listener assignment for the "Restart" button here
   restartBtn = document.querySelector("#restartBtn");
+  replayBtn = document.querySelector("#replayBtn");
 
   // Check if the event listener has not been attached before adding it
   if (!restartBtn.onclick) {
     restartBtn.onclick = restartGame;
+  }
+
+  if (!replayBtn.onclick) {
+    replayBtn.onclick = startReplay;
   }
 });
 
@@ -28,9 +38,9 @@ function initializeGame() {
   cellContainer.innerHTML = ""; // Clear existing cells
 
   // Reset player arrays
-  playerX = [];
-  playerO = [];
-  playHistory = [];
+  // playerX = [];
+  // playerO = [];
+  // playHistory = [];
 
   for (let i = 0; i < size; i++) {
     const row = document.createElement("div");
@@ -95,7 +105,7 @@ function initializeGame() {
   winConditions.push(row4);
 
   console.log("size:", size);
-  console.log("totalCells:", totalCells);
+  // console.log("totalCells:", totalCells);
   console.log("All way to win :", winConditions);
 
   options = Array(totalCells).fill("");
@@ -110,7 +120,7 @@ function initializeGame() {
 function cellClicked() {
   const cellIndex = this.getAttribute("cellIndex");
 
-  if (options[cellIndex] !== "" || !running) {
+  if (options[cellIndex] !== "" || !running || replayStatus) {
     return;
   }
 
@@ -136,19 +146,17 @@ function updateCell(cell, index) {
     contentSpan.classList.add("content", currentPlayer);
   }
 
-  // Update player arrays
-  if (currentPlayer === "X") {
-    playerX.push(index);
-  } else {
-    playerO.push(index);
+  // Update player arrays only during the actual game, not during replay
+  if (running && !replayStatus) {
+    if (currentPlayer === "X") {
+      playerX.push(index);
+    } else {
+      playerO.push(index);
+    }
+    // Update playHistory array only during the actual game, not during replay
+    playHistory.push({ player: currentPlayer, index });
+    console.log({ player: currentPlayer, index });
   }
-
-  // Update playHistory array
-  // let tmp = [currentPlayer,index]
-  // playHistory.push(tmp);
-  // console.log("index:",tmp);
-  playHistory.push(index);
-  console.log("index:", index);
 }
 
 function changePlayer() {
@@ -241,4 +249,62 @@ function restartGame() {
   playerO = [];
   playHistory = [];
   console.log("restartGame");
+}
+
+function startReplay() {
+  if (playHistory.length === 0) {
+    console.log("No moves to replay.");
+    replayStatus = false;
+    return;
+  }
+
+  console.log("start Replay");
+
+  // Disable the "Restart" and "Replay" buttons during replay
+  restartBtn.disabled = true;
+  replayBtn.disabled = true;
+
+  // Reset the game and start replaying moves
+  initializeGame();
+  replayIndex = 0;
+  replayStatus = true;  // Set replayStatus to true after initializing
+  replayNextMove();
+}
+
+function replayNextMove() {
+  console.log("Replaying move", replayIndex, "of", playHistory.length);
+  
+  if (replayIndex < playHistory.length) {
+    const move = playHistory[replayIndex];
+    replayMove(move);
+    replayIndex++;
+    setTimeout(replayNextMove, 1000); // Adjust the delay between moves as needed
+  } else {
+    // console.log("currentPlayer",currentPlayer);
+    console.log("Replay complete");
+    // Enable the "Restart" and "Replay" buttons after replay is complete
+    restartBtn.disabled = false;
+    replayBtn.disabled = false;
+    replayStatus = false;  // Set replayStatus to false after replay is complete
+
+    // I don't know why without it it doesn't checkWinner();
+    changePlayer();  
+    checkWinner();
+  }
+}
+
+function replayMove(move) {
+  const { player, index } = move;
+  const cell = cells[parseInt(index)]; // Convert index to a number
+
+  // Update the cell content and player in the status text
+  updateCell(cell, parseInt(index));
+
+  // Switch to the other player for the next move
+  currentPlayer = player === "X" ? "O" : "X";
+
+  // Change the player in the status text
+  statusText.innerHTML = `<span style="color: ${getColor(
+    player
+  )};">${player}'s turn (Replaying)</span>`;
 }

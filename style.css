@@ -12,6 +12,17 @@ body {
   margin: 0;
 }
 
+#gameContainer {
+  font-family: "Permanent Marker", cursive;
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 10px;
+  overflow-x: auto; /* Add this to make the container horizontally scrollable */
+  overflow-y: auto; /* Add this to make the container vertically scrollable */
+  max-height: calc(100vh - 40px); /* Adjust the value based on your design */
+  max-width: calc(100vw - 20px); /* Adjust the value based on your design */
+}
+
 .cell {
   width: 75px;
   height: 75px;
@@ -33,13 +44,6 @@ body {
 
 .cell:hover {
   background-color: #a3a1a1;
-}
-
-#gameContainer {
-  font-family: "Permanent Marker", cursive;
-  text-align: center;
-  font-size: 24px;
-  margin-bottom: 10px;
 }
 
 #statusText {
