@@ -1,3 +1,4 @@
 # Hello
-3*3 4*4 5*5 
-Tic-Tac-Toe-Game You can choose the size. :)
+Tic-Tac-Toe-Game
+3x3 4x4 5x5  
+You can choose the size. :)
